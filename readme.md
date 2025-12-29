@@ -1,18 +1,8 @@
-Welcome to ?!
+Welcome! ``sceta`` stands for Star Count Evolutionary Time Analysis.
 
-gscetno py ~ sct
+Using this pipeline, one can counts stars and the corresponding evolutionary times on the color-magnitude plane of resolved globular clusters. Currently, it works only for HUGS. It is entirely written in Python. 
 
-rgcscetatpnuvop
-sceta
-scet
-scetapy
-stcet
-discrepy
-scintally
-
-resolved globular clusters STar Count-Evolutionary Time analysis technique in PYthon with near-ultraviolent and optical photometric data
-
-These routine were written as part of my (Laksh Gupta) undergraduate thesis. These routines essentially perform star count-crossing time analysis for Globular Cluster on F275W-F336W vs F275W Color Magnitude plane. The MSTO and WD routine are now working. The HB routine is still under work.
+These routine were written as part of my (Laksh Gupta) undergraduate thesis. The MSTO and WD routine are now working. The HB routine is still under work.
 
 - If you are working with a cluster for the first time, 
     - make sure to have downloaded and stored the model files in a folder and have that path in theoreticalmodels.initialize(). 
@@ -32,3 +22,5 @@ These routine were written as part of my (Laksh Gupta) undergraduate thesis. The
 
 - For Radial Distribution and Spatial Plot of Stellar Phases:
     - if 'singlecolor=False', colors of the stars in previous figures and this will be the same. 
+
+Contact me at lakshgupta.phy@gmail.com
