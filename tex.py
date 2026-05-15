@@ -1,3 +1,5 @@
+import matplotlib
+# matplotlib.use('Agg')   #
 import matplotlib.pyplot as plt
 
 A = 6  # Want figures to be A6
@@ -8,8 +10,8 @@ plt.rc('font', family='serif')
 # There seems to be some problem with LaTex printing. The first plot never prints according to the required dpi, hence here I print a *not-associated-to-this-study* plot.
 
 plt.rcParams['figure.dpi']=100
-plt.tight_layout()
 fig = plt.figure(figsize=(5,5))
 
 plt.scatter(1, 1, color = 'deeppink', marker = 's', s=10, edgecolors='none')
-plt.close() 
+fig.canvas.draw()
+plt.close(fig)
