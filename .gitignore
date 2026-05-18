@@ -1,5 +1,7 @@
 /Updates/
 /Others/
+__pycache__/
+*.pyc
 controls.py
 ImportAllClusterData.ipynb
 libraries.py
