@@ -10,7 +10,7 @@ def Initialize():
     dictisoagesspelled = {0: 'df9000', 1: 'df10000', 2: 'df11000', 3: 'df12000'}
 
     dictfilters = {0: '275', 1: '336', 2: '438', 3: '606', 4: '814'}
-    dictfiltermagnames = {0: '\(m_{F275W} \)', 1: '\(m_{F336W} \)', 2: '\(m_{F438W} \)', 3: '\(m_{F606W} \)', 4: '\(m_{F814W} \)'}
+    dictfiltermagnames = {0: r'$ m_{\rm F275W} $', 1: r'$ m_{\rm F336W} $', 2: r'$ m_{\rm F438W} $', 3: r'$ m_{\rm F606W} $', 4: r'$ m_{\rm F814W} $'}
 
     allfilters = ["F275W","F336W","F438W","F606W","F814W"]
 

@@ -1,0 +1,118 @@
+{
+  "_defaults": {
+    "age_manual": 12,
+    "c_masset": 80,
+    "a_masset1": 70,
+    "a_masset2": 60,
+    "wdmass": "054",
+
+    "iso_model": "iso131", 
+    "iso_DM_corr": 0.01, 
+    "iso_redd_corr": -0.005, 
+    "iso_336_shift": 0.1, 
+
+    "et_model": "et131_c", 
+    "et_DM_corr": 0.01, 
+    "et_redd_corr": -0.030, 
+    "et_336_shift": 0.1, 
+
+    "wd_model": "wdCOHZ0420", 
+    "wd_DM_corr": -0.01, 
+    "wd_redd_corr": 0.0, 
+    "wd_336_shift": 0.0, 
+
+    "et1_model": "et131_a1", 
+    "et1_DM_corr": -0.15, 
+    "et1_redd_corr": -0.025, 
+    "et1_336_shift": 0.1, 
+
+    "et2_model": "et131_a2", 
+    "et2_DM_corr": -0.11, 
+    "et2_redd_corr": 0.0, 
+    "et2_336_shift": 0.17, 
+
+    "ylim_min": 16, 
+    "ylim_max": 26, 
+    "xlim_min": -2, 
+    "xlim_max": 3, 
+
+    "bluelimit": 0.7,
+    "redlimit": 1.1, 
+    "sigmacut": 1.5, 
+
+    "max_allowed_mag": 24.243, 
+    "min_allowed_mag": 21.4,
+    "binsize": 0.3, 
+    "division": 23.5,
+    "min_mag": 20, 
+    "max_mag": 26, 
+    "min_col": -2.5, 
+    "max2": 1,
+    "wdcolmin": -0.6, 
+    "wdcolmax": 0,
+    "wdcolminbri": -0.25,
+    "wdcolmaxbri": -1,
+    "briwdstart": 20, 
+
+    "maxcol": 2, 
+    "mincol": 0.76},
+  "2808": {
+    "age_manual": 12,
+    "c_masset": 80,
+    "a_masset1": 70,
+    "a_masset2": 60,
+    "wdmass": "054",
+
+    "iso_model": "iso131", 
+    "iso_DM_corr": 0.01, 
+    "iso_redd_corr": -0.005, 
+    "iso_336_shift": 0.1, 
+
+    "et_model": "et131_c", 
+    "et_DM_corr": 0.01, 
+    "et_redd_corr": -0.030, 
+    "et_336_shift": 0.1, 
+
+    "wd_model": "wdCOHZ0420", 
+    "wd_DM_corr": -0.01, 
+    "wd_redd_corr": 0.0, 
+    "wd_336_shift": 0.0, 
+
+    "et1_model": "et131_a1", 
+    "et1_DM_corr": -0.15, 
+    "et1_redd_corr": -0.025, 
+    "et1_336_shift": 0.1, 
+
+    "et2_model": "et131_a2", 
+    "et2_DM_corr": -0.11, 
+    "et2_redd_corr": 0.0, 
+    "et2_336_shift": 0.17, 
+
+    "ylim_min": 16, 
+    "ylim_max": 26, 
+    "xlim_min": -2, 
+    "xlim_max": 3, 
+
+    "bluelimit": 0.7,
+    "redlimit": 1.1, 
+    "sigmacut": 1.5, 
+
+    "max_allowed_mag": 24.243, 
+    "min_allowed_mag": 21.4,
+    "binsize": 0.3, 
+    "division": 23.5,
+    "min_mag": 20, 
+    "max_mag": 26, 
+    "min_col": -2.5, 
+    "max2": 1,
+    "wdcolmin": -0.6, 
+    "wdcolmax": 0,
+    "wdcolminbri": -0.25,
+    "wdcolmaxbri": -1,
+    "briwdstart": 20, 
+
+    "maxcol": 2, 
+    "mincol": 0.76
+  }
+}
+

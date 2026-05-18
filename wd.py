@@ -59,14 +59,14 @@ def WDLFNew(dfWDCounts):
     return dfWDCounts, tobeprintedcorr
 
 def initialize(merged_df, 
-               wdmodel, clustername,
+               wdmodel, clustername, save_plots_path,
                max_allowed_mag, min_allowed_mag, 
-               dpi, binsize, 
+               binsize, 
                division,
                min_mag, max_mag, min_col, max2,
                wdcolmin, wdcolmax, wdcolminbri, wdcolmaxbri,
                briwdstart,
-               wantlegend, Completeness):
+               wantlegend, Completeness, save):
 
     print("WD Analysis being run for " + str(clustername) +".")
 
@@ -75,9 +75,7 @@ def initialize(merged_df,
 
     a = 1
 
-    plt.tight_layout()
-    plt.rcParams['figure.dpi']=dpi
-    fig = plt.figure(figsize=(14, 65))
+    plt.figure(figsize=(10,8))
     plt.subplots_adjust(wspace = 0.2)
 
     i = 0
@@ -125,35 +123,35 @@ def initialize(merged_df,
 
     # Plotting now
 
-    plt.subplot(6,2,a)
+    plt.subplot(1,2,a)
 
-    plt.scatter(dfplot['x2'], dfplot['y2'], marker = markersize_set, s=10, edgecolors='none', color='black', label = str(len(dfplot)))
-    plt.scatter(dfwdcalbright['x2'], dfwdcalbright['y2'], marker = '*', s=100, edgecolors='none', color='teal', label = str(len(dfwdcalbright['y2'])) + ' "Bright"')
+    plt.scatter(dfplot['x2'], dfplot['y2'], marker = markersize_set, s=10, edgecolors='none', color='black', label = str(len(dfplot)), rasterized=True)
+    plt.scatter(dfwdcalbright['x2'], dfwdcalbright['y2'], marker = '*', s=100, edgecolors='none', color='teal', label = str(len(dfwdcalbright['y2'])) + ' "Bright"', rasterized=True)
 
     # division = np.float64(division)
-    plt.axhline(y=division, color='red', linestyle='--', linewidth=2, label = str(division))
-    plt.axhline(y=max_allowed_mag, color='red', linestyle='--', linewidth=2, label = str(max_allowed_mag))
+    plt.axhline(y=division, color='red', linestyle='--', linewidth=2, label = str(division), rasterized=True)
+    plt.axhline(y=max_allowed_mag, color='red', linestyle='--', linewidth=2, label = str(max_allowed_mag), rasterized=True)
 
     bin1 = pd.DataFrame()
     bin2 = pd.DataFrame()
     bin1 = dfwdcal[dfwdcal['y2'] <= division]
     bin2 = dfwdcal[dfwdcal['y2'] > division]
-    plt.scatter(bin1['x2'], bin1['y2'], marker = '^', s=100, edgecolors='none', color='dodgerblue', label = str(len(bin1)) + ' Upper')
-    plt.scatter(bin2['x2'], bin2['y2'], marker = '^', s=100, edgecolors='none', color='red', label = str(len(bin2)) + ' Lower')
+    plt.scatter(bin1['x2'], bin1['y2'], marker = '^', s=100, edgecolors='none', color='dodgerblue', label = str(len(bin1)) + ' Upper', rasterized=True)
+    plt.scatter(bin2['x2'], bin2['y2'], marker = '^', s=100, edgecolors='none', color='red', label = str(len(bin2)) + ' Lower', rasterized=True)
 
     # Plotting WD Cooling Models
 
     wdlifetimecomb, pointscomb = WDCrossingTime(wdmodel, division)
-    plt.scatter((pointscomb[0] - pointscomb[1]), pointscomb[0], marker = '^', s=500, edgecolors='none', color='black', label = wdlifetimecomb, zorder = 3)
+    plt.scatter((pointscomb[0] - pointscomb[1]), pointscomb[0], marker = '^', s=500, edgecolors='none', color='black', label = wdlifetimecomb, zorder = 3, rasterized=True)
     print('Upper lifetime - ' + str(wdlifetimecomb) + " Myrs")
     WDCTup = wdlifetimecomb
 
     wdlifetimecomb, pointscomb = WDCrossingTime(wdmodel, max_allowed_mag)
-    plt.scatter((pointscomb[0] - pointscomb[1]), pointscomb[0], marker = '^', s=500, edgecolors='none', color='black', label = wdlifetimecomb, zorder = 3)
+    plt.scatter((pointscomb[0] - pointscomb[1]), pointscomb[0], marker = '^', s=500, edgecolors='none', color='black', label = wdlifetimecomb, zorder = 3, rasterized=True)
     print('Lower lifetime - ' + str(wdlifetimecomb) + " Myrs")
     WDCTlo = wdlifetimecomb
 
-    plt.plot((wdmodel['F' + f1 + 'W'] - wdmodel['F' + f2 + 'W']), (wdmodel['F' + f1 + 'W']), marker = markersize_set, markersize=0.1, linestyle='-', markeredgecolor='none', lw = 4, c ='hotpink', label = 'CO/H (' + dictwdmasses[0] + ' \(M_\odot\))') #  + ' INT - ' + str(wdlifetimeintCOH) + ' EXT - ' + str(wdlifetimeextCOH)
+    plt.plot((wdmodel['F' + f1 + 'W'] - wdmodel['F' + f2 + 'W']), (wdmodel['F' + f1 + 'W']), marker = markersize_set, markersize=0.1, linestyle='-', markeredgecolor='none', lw = 4, c ='hotpink', label = 'CO/H (' + dictwdmasses[0] + ' \(M_\odot\))', rasterized=True) #  + ' INT - ' + str(wdlifetimeintCOH) + ' EXT - ' + str(wdlifetimeextCOH)
 
     if wantlegend:
         plt.legend(fontsize=15, loc = 'upper left')
@@ -176,11 +174,11 @@ def initialize(merged_df,
     sum_values_lower_corr = round(dflf336int.loc[row_index+1:, 'Count Compl'].sum(), 1)
     # print(sum_values_lower_corr)
 
-    plt.subplot(6,2,a)
+    plt.subplot(1,2,a)
 
     bin_centers = (dflf336int['Bin Lower'] + dflf336int['Bin Upper']) / 2
-    plt.step(bin_centers, dflf336int['NCount Compl'], linestyle = '-', linewidth = 3,  marker='o', markersize = 3, color = 'teal', label = str(sum_values_upper_ncorr) + '+' + str (sum_values_lower_ncorr) + '=' + str(round(sum_values_upper_ncorr + sum_values_lower_ncorr, 1)))
-    plt.step(bin_centers, dflf336int['Count Compl'], linestyle = '-', linewidth = 3,  marker='o', markersize = 3, color = 'crimson', label = str(sum_values_upper_corr) + '+' + str (sum_values_lower_corr) + '=' + str(round(sum_values_upper_corr + sum_values_lower_corr, 1)))
+    plt.step(bin_centers, dflf336int['NCount Compl'], linestyle = '-', linewidth = 3,  marker='o', markersize = 3, color = 'teal', label = str(sum_values_upper_ncorr) + '+' + str (sum_values_lower_ncorr) + '=' + str(round(sum_values_upper_ncorr + sum_values_lower_ncorr, 1)), rasterized=True)
+    plt.step(bin_centers, dflf336int['Count Compl'], linestyle = '-', linewidth = 3,  marker='o', markersize = 3, color = 'crimson', label = str(sum_values_upper_corr) + '+' + str (sum_values_lower_corr) + '=' + str(round(sum_values_upper_corr + sum_values_lower_corr, 1)), rasterized=True)
     # print(dflf336int)
 
     plt.legend(loc='upper left', fontsize=15)
@@ -203,7 +201,7 @@ def initialize(merged_df,
         concatnew36finalWDcountONLYINT = df_selected
         print(concatnew36finalWDcountONLYINT)
 
-        plt.subplot(6,2,a)
+        plt.subplot(1,2,a)
 
         titlestore = 'INT Observed'
         dfWDCounts = concatnew36finalWDcountONLYINT
@@ -212,8 +210,8 @@ def initialize(merged_df,
         bin_edges = dfWDCounts['bin_edges']
         error_norm_counts = dfWDCounts['error_cum_counts_norm']
         # plt.step(bin_edges[:], cumulative_counts_ncorr_norm[:], where='mid', color='dodgerblue', linestyle='-.', label = titlestore + ' - ' + str(round(tobeprintedcorr, 0)))
-        plt.step(bin_edges[:], cumulative_counts_ncorr_norm[:], where='mid', color='dodgerblue', linestyle='-.', label = titlestore)
-        plt.errorbar(bin_edges[:], cumulative_counts_ncorr_norm[:], yerr=error_norm_counts[:], fmt='o', color='red', capsize = 0.5, label='Error Bars')
+        plt.step(bin_edges[:], cumulative_counts_ncorr_norm[:], where='mid', color='dodgerblue', linestyle='-.', label = titlestore, rasterized=True)
+        plt.errorbar(bin_edges[:], cumulative_counts_ncorr_norm[:], yerr=error_norm_counts[:], fmt='o', color='red', capsize = 0.5, label='Error Bars', rasterized=True)
         plt.ylabel('Normalized Number of WDs', fontsize = 20)
         plt.xlabel('\( m_{F275W} \)', fontsize = 20)
         plt.xticks(fontsize = 20)
@@ -224,6 +222,9 @@ def initialize(merged_df,
         plt.gca().xaxis.set_major_formatter(formatter)
         a = a + 2
 
+    plt.tight_layout()
+    if save:
+        plt.savefig(f'{save_plots_path}WD_{clustername}.pdf')
     plt.show()
 
     return locals()
