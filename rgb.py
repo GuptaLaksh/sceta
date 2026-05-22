@@ -4,6 +4,9 @@ import pandas as pd
 import importlib
 from scipy.interpolate import interp1d
 
+import tex
+importlib.reload(tex)
+
 import namingroutine
 importlib.reload(namingroutine)
 names = namingroutine.Initialize()
@@ -12,7 +15,7 @@ names = namingroutine.Initialize()
 def gaussian(x, amp, mean, sigma, const):
     return amp * np.exp(-((x - mean)**2) / (2 * sigma**2)) + const
 
-def initialize(canonicalet, canonicaliso, df, hb_id, maxcol, mincol, everynth, rgb_division, usewhich, col1_fil, col2_fil, mag_fil, sigma_cut):
+def initialize(canonicalet, canonicaliso, df, save, save_plots_path, clustername, hb_id, maxcol, mincol, everynth, rgb_division, usewhich, col1_fil, col2_fil, mag_fil, sigma_cut):
     
     if usewhich == 'ET':
         usewhichmodel = canonicalet
@@ -154,5 +157,8 @@ def initialize(canonicalet, canonicaliso, df, hb_id, maxcol, mincol, everynth, r
 
     fig.tight_layout()
     # plt.savefig(f'/Users/lakshgupta/Downloads/Personal/P-NGC2808WD/All Clusters Analysis/Paper 2/RGB_Analysis.pdf', dpi=300)
-    plt.show()
 
+    if save:
+        fig.savefig(f'{save_plots_path}{clustername}_RGB.pdf')
+    
+    plt.show()

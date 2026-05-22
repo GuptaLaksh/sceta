@@ -5,6 +5,9 @@ import func_analysis
 import matplotlib.pyplot as plt
 from matplotlib.ticker import FuncFormatter
 
+import tex
+importlib.reload(tex)
+
 import namingroutine
 importlib.reload(namingroutine)
 names = namingroutine.Initialize()
@@ -59,14 +62,14 @@ def WDLFNew(dfWDCounts):
     return dfWDCounts, tobeprintedcorr
 
 def initialize(merged_df, 
-               wdmodel, clustername, save_plots_path,
+               wdmodel, clustername, save_plots_path, save,
                max_allowed_mag, min_allowed_mag, 
                binsize, 
                division,
                min_mag, max_mag, min_col, max2,
                wdcolmin, wdcolmax, wdcolminbri, wdcolmaxbri,
                briwdstart,
-               wantlegend, Completeness, save):
+               wantlegend, Completeness):
 
     print("WD Analysis being run for " + str(clustername) +".")
 
@@ -183,7 +186,7 @@ def initialize(merged_df,
 
     plt.legend(loc='upper left', fontsize=15)
     plt.xlabel('\( m_{F275W} \)', fontsize = 20)
-    plt.ylabel('Number of WDs (IF)', fontsize = 20)
+    plt.ylabel('Number of WDs', fontsize = 20)
     plt.yticks(fontsize=20) 
     plt.xticks(fontsize=20)
     a = a + 1
@@ -224,7 +227,7 @@ def initialize(merged_df,
 
     plt.tight_layout()
     if save:
-        plt.savefig(f'{save_plots_path}WD_{clustername}.pdf')
+        plt.savefig(f'{save_plots_path}{clustername}_WD.pdf')
     plt.show()
 
     return locals()

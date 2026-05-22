@@ -1,5 +1,7 @@
-import tex
 import importlib
+import tex
+importlib.reload(tex)
+
 import pandas as pd
 import numpy as np
 from shapely.geometry import Polygon, Point
@@ -11,68 +13,69 @@ import namingroutine
 importlib.reload(namingroutine)
 names = namingroutine.Initialize()
 
+dictfilters = names['dictfilters']
+dictfiltermagnames = names['dictfiltermagnames']
+
 markersize_set = 'o'
+
+
+def MSTOCrossingTime(bluestIsochronepointRow, et, f1, f2, f3, uppermagupper, lowermagupper, lowermaglower, df_part1, leftcol, rightcol, timecolstring):
+
+    dataframeusingevoltrack = et
+    # print(dataframeusingevoltrack)
+    
+    y1 = dataframeusingevoltrack['F' + f3 + 'W'] 
+    x1 = dataframeusingevoltrack['F' + f1 + 'W'] - dataframeusingevoltrack['F' + f2 + 'W']
+    lifetime = dataframeusingevoltrack[timecolstring]
+    result3 = pd.concat([y1, x1, lifetime], axis=1) # made a df called result with 2 cols x2 and y2 
+    
+    dfusing = result3[(result3.iloc[:,1] >= (df_part1.iloc[:, 0].iloc[-1] - leftcol)) & (result3.iloc[:,1] <= (df_part1.iloc[:, 0].iloc[-1] + rightcol)) & (result3.iloc[:,0] >= (bluestIsochronepointRow[0]-0.5)) & (result3.iloc[:,0] <= (bluestIsochronepointRow[0]+0.5))]
+    # print(df_part1.iloc[:, 0].iloc[-1])
+    # print(dfusing) 
+
+    nearest_value_min = (dfusing.iloc[:, 0] - uppermagupper).abs().idxmin()
+    nearest_value_center = (dfusing.iloc[:, 0] - lowermagupper).abs().idxmin()
+    nearest_value_max = (dfusing.iloc[:, 0] - lowermaglower).abs().idxmin()   
+
+    rowstobekept = dataframeusingevoltrack.index.get_indexer([nearest_value_min, nearest_value_center, nearest_value_max])
+    dfworth = dataframeusingevoltrack.iloc[rowstobekept]
+
+    # rowstobekept = [nearest_value_min, nearest_value_center, nearest_value_max]
+    # dfworth = dataframeusingevoltrack.iloc[rowstobekept]
+
+    value1 = float(dfworth.iloc[1, 0])
+    value2 = float(dfworth.iloc[0, 0])
+    value3 = float(dfworth.iloc[2, 0])
+
+    brightestpointmag = dataframeusingevoltrack.loc[nearest_value_min, 'F' + f3 + 'W']
+    brightestpointcol = dataframeusingevoltrack.loc[nearest_value_min, 'F' + f1 + 'W'] - dataframeusingevoltrack.loc[nearest_value_min, 'F' + f2 + 'W']
+
+    faintestpointmag = dataframeusingevoltrack.loc[nearest_value_max, 'F' + f3 + 'W']
+    faintestpointcol = dataframeusingevoltrack.loc[nearest_value_max, 'F' + f1 + 'W'] - dataframeusingevoltrack.loc[nearest_value_max, 'F' + f2 + 'W']
+
+    centerpointmag = dataframeusingevoltrack.loc[nearest_value_center, 'F' + f3 + 'W']
+    centerpointcol = dataframeusingevoltrack.loc[nearest_value_center, 'F' + f1 + 'W'] - dataframeusingevoltrack.loc[nearest_value_center, 'F' + f2 + 'W']    
+
+    return round(((10**value3 - 10**value1) / (10**6)), 2), round(((10**value1 - 10**value2) / (10**6)), 2), brightestpointmag, brightestpointcol, faintestpointmag, faintestpointcol, centerpointmag, centerpointcol
+
+def GivenRectanglePoints(x2, y2, IDs, parallelogram_vertices):
+    parallelogram_shapely = Polygon(parallelogram_vertices)
+    result4 = pd.concat([x2, y2, IDs], axis=1) # made a df called result with 2 cols x2 and y2 
+    mask = result4.apply(lambda row: Point(row.iloc[0], row.iloc[1]).within(parallelogram_shapely), axis=1)
+    points_inside_parallelogram = result4[mask]
+
+    return points_inside_parallelogram.iloc[:,0], points_inside_parallelogram.iloc[:,1], points_inside_parallelogram.iloc[:,2]
 
 def initialize(df1,
                keyiso, keyet, key3_st, key4_st,
                c_iso, c_et, a_et1, a_et2, 
-               clustername, wantabund, Completeness, save_plots_path,
+               clustername, wantabund, Completeness, save_plots_path, save,
                delalpholder,
                g,
                bluelimit, redlimit, sigmacut,
-               wantcsv, wantlegend, save):
+               wantcsv, wantlegend):
     
     print("MSTO Analysis being run for " + str(clustername) +".")
-
-    dictfilters = names['dictfilters']
-    dictfiltermagnames = names['dictfiltermagnames']
-
-    def MSTOCrossingTime(bluestIsochronepointRow, et, f1, f2, f3, uppermagupper, lowermagupper, lowermaglower, df_part1, leftcol, rightcol, timecolstring):
-
-        dataframeusingevoltrack = et
-        # print(dataframeusingevoltrack)
-        
-        y1 = dataframeusingevoltrack['F' + f3 + 'W'] 
-        x1 = dataframeusingevoltrack['F' + f1 + 'W'] - dataframeusingevoltrack['F' + f2 + 'W']
-        lifetime = dataframeusingevoltrack[timecolstring]
-        result3 = pd.concat([y1, x1, lifetime], axis=1) # made a df called result with 2 cols x2 and y2 
-        
-        dfusing = result3[(result3.iloc[:,1] >= (df_part1.iloc[:, 0].iloc[-1] - leftcol)) & (result3.iloc[:,1] <= (df_part1.iloc[:, 0].iloc[-1] + rightcol)) & (result3.iloc[:,0] >= (bluestIsochronepointRow[0]-0.5)) & (result3.iloc[:,0] <= (bluestIsochronepointRow[0]+0.5))]
-        # print(df_part1.iloc[:, 0].iloc[-1])
-        # print(dfusing) 
-
-        nearest_value_min = (dfusing.iloc[:, 0] - uppermagupper).abs().idxmin()
-        nearest_value_center = (dfusing.iloc[:, 0] - lowermagupper).abs().idxmin()
-        nearest_value_max = (dfusing.iloc[:, 0] - lowermaglower).abs().idxmin()   
-
-        rowstobekept = dataframeusingevoltrack.index.get_indexer([nearest_value_min, nearest_value_center, nearest_value_max])
-        dfworth = dataframeusingevoltrack.iloc[rowstobekept]
-
-        # rowstobekept = [nearest_value_min, nearest_value_center, nearest_value_max]
-        # dfworth = dataframeusingevoltrack.iloc[rowstobekept]
-
-        value1 = float(dfworth.iloc[1, 0])
-        value2 = float(dfworth.iloc[0, 0])
-        value3 = float(dfworth.iloc[2, 0])
-
-        brightestpointmag = dataframeusingevoltrack.loc[nearest_value_min, 'F' + f3 + 'W']
-        brightestpointcol = dataframeusingevoltrack.loc[nearest_value_min, 'F' + f1 + 'W'] - dataframeusingevoltrack.loc[nearest_value_min, 'F' + f2 + 'W']
-
-        faintestpointmag = dataframeusingevoltrack.loc[nearest_value_max, 'F' + f3 + 'W']
-        faintestpointcol = dataframeusingevoltrack.loc[nearest_value_max, 'F' + f1 + 'W'] - dataframeusingevoltrack.loc[nearest_value_max, 'F' + f2 + 'W']
-
-        centerpointmag = dataframeusingevoltrack.loc[nearest_value_center, 'F' + f3 + 'W']
-        centerpointcol = dataframeusingevoltrack.loc[nearest_value_center, 'F' + f1 + 'W'] - dataframeusingevoltrack.loc[nearest_value_center, 'F' + f2 + 'W']    
-
-        return round(((10**value3 - 10**value1) / (10**6)), 2), round(((10**value1 - 10**value2) / (10**6)), 2), brightestpointmag, brightestpointcol, faintestpointmag, faintestpointcol, centerpointmag, centerpointcol
-
-    def GivenRectanglePoints(x2, y2, IDs, parallelogram_vertices):
-        parallelogram_shapely = Polygon(parallelogram_vertices)
-        result4 = pd.concat([x2, y2, IDs], axis=1) # made a df called result with 2 cols x2 and y2 
-        mask = result4.apply(lambda row: Point(row.iloc[0], row.iloc[1]).within(parallelogram_shapely), axis=1)
-        points_inside_parallelogram = result4[mask]
-
-        return points_inside_parallelogram.iloc[:,0], points_inside_parallelogram.iloc[:,1], points_inside_parallelogram.iloc[:,2]
 
     # OLD BaSTI Models
     whichmass = '(M/Mo)' # '(M/Mo)in'
@@ -236,7 +239,7 @@ def initialize(df1,
         print("Magnitude Range: " + (str(round(uppermagupper, 3)) + ' - ' + str(round(lowermaglower, 3))) + " = " + str(abs(round(uppermagupper - lowermaglower, 3))) + " and Color Range: " + (str(round(uppercolupper, 3)) + ' - ' + str(round(lowercollower, 3))) + " = " + (str(abs(round(uppercolupper - lowercollower, 3)))))
 
         if plots:
-            plt.figure(figsize=(25, 20), dpi=100) 
+            plt.figure(figsize=(25, 20)) 
             plt.subplots_adjust(wspace = 0.20)
 
             plt.subplot(h,w,a)
@@ -301,8 +304,8 @@ def initialize(df1,
 
         if plots:
             plt.subplot(h,w,a)
-            plt.scatter(x2, y2, marker = markersize_set, s=15, edgecolors='none', color=colorthis, alpha = 0.15)
-            plt.scatter(concatnew['x2'], concatnew['y2'], marker = markersize_set, s=40, edgecolors='none', color='darkgreen')
+            plt.scatter(x2, y2, marker = markersize_set, s=15, edgecolors='none', color=colorthis, alpha = 0.15, rasterized=True)
+            plt.scatter(concatnew['x2'], concatnew['y2'], marker = markersize_set, s=40, edgecolors='none', color='darkgreen', rasterized=True)
             # printing the parallelogram
             plt.scatter(concatnewupper['x3'], concatnewupper['y3'], marker = '*', s=250, edgecolors='none', color='deeppink', label = str(len(concatnewupper)) + ' / ' + str(finalcountupper), rasterized=True)
             plt.scatter(concatnewlower['x4'], concatnewlower['y4'], marker = '*', s=250, edgecolors='none', color='indigo', label = str(len(concatnewlower)) + ' / ' + str(finalcountlower), rasterized=True)
@@ -360,13 +363,13 @@ def initialize(df1,
             a = a + 1
             plt.tight_layout()
             if save:
-                plt.savefig(f'{save_plots_path}{clustername}_MSTO_DeltaM{deltaalpha}.pdf')
+                plt.savefig(f'{save_plots_path}{clustername}_MSTO_DeltaM{deltaalpha}.pdf', dpi=100)
             plt.show()
         
         # He-enhanced CTs
 
         if plots:
-            fig = plt.figure(figsize=(15, 15), dpi=100) 
+            fig = plt.figure(figsize=(15, 15)) 
             # plt.subplots_adjust(wspace = 0.20)
 
             min_mag -= 0.05
@@ -380,23 +383,24 @@ def initialize(df1,
             # max2 = 1.1
 
             plt.subplot(1,1,1)
-            plt.scatter(x2, y2, marker = markersize_set, s=15, edgecolors='none', color=colorthis, alpha = 0.15)
+            plt.scatter(x2, y2, marker = markersize_set, s=15, edgecolors='none', color=colorthis, alpha = 0.15, rasterized=True)
 
-            plt.plot(c_iso['F275W'] - c_iso['F336W'], c_iso['F275W'], color = 'dodgerblue', lw = 5, linestyle = '-', markersize = 0.1, marker = markersize_set)
-            plt.scatter(dfusingisoini['F275W'] - dfusingisoini['F336W'], dfusingisoini['F275W'], marker = markersize_set, s=200, edgecolors='none', color='dodgerblue')
-            plt.scatter(bluestIsochronepointRow[0] - bluestIsochronepointRow[1], bluestIsochronepointRow[0], marker = '*', s = 500, edgecolors='black', color='gold', zorder = 3)
-            plt.plot(c_et['F275W'] - c_et['F336W'], c_et['F275W'], marker = markersize_set, markersize=0.1, linestyle = '-', lw = 5, color='orange', label = 'ET of .' + str(keyet) + ' \(M_\odot\)')
+            plt.plot(c_iso['F275W'] - c_iso['F336W'], c_iso['F275W'], color = 'dodgerblue', lw = 5, linestyle = '-', markersize = 0.1, marker = markersize_set, rasterized=True)
+            plt.scatter(dfusingisoini['F275W'] - dfusingisoini['F336W'], dfusingisoini['F275W'], marker = markersize_set, s=200, edgecolors='none', color='dodgerblue', rasterized=True)
+            plt.scatter(bluestIsochronepointRow[0] - bluestIsochronepointRow[1], bluestIsochronepointRow[0], marker = '*', s = 500, edgecolors='black', color='gold', zorder = 3, rasterized=True)
+            plt.plot(c_et['F275W'] - c_et['F336W'], c_et['F275W'], marker = markersize_set, markersize=0.1, linestyle = '-', lw = 5, color='orange', label = 'ET of .' + str(keyet) + ' \(M_\odot\)', rasterized=True)
             
-            plt.scatter(concatnewupper['x3'], concatnewupper['y3'], marker = '*', s=250, edgecolors='none', color='deeppink', label = str(len(concatnewupper)) + ' / ' + str(finalcountupper) + " Upper Bin [LF - " + str(abs(highbin)) + "]")
-            plt.scatter(concatnewlower['x4'], concatnewlower['y4'], marker = '*', s=250, edgecolors='none', color='indigo', label = str(len(concatnewlower)) + ' / ' + str(finalcountlower) + " Lower Bin [LF - " + str(abs(lowbin)) + "]")
-            plt.scatter(brightestpointcol, brightestpointmag, marker = '^', s=500, edgecolors='none', color='black', zorder = 3)
-            plt.scatter(faintestpointcol, faintestpointmag, marker = '^', s=500, edgecolors='none', color='black', zorder = 3)
-            plt.scatter(centerpointcol, centerpointmag, marker = '^', s=500, edgecolors='none', color='black', zorder = 3)
+            plt.scatter(concatnewupper['x3'], concatnewupper['y3'], marker = '*', s=250, edgecolors='none', color='deeppink', label = str(len(concatnewupper)) + ' / ' + str(finalcountupper) + " Upper Bin [LF - " + str(abs(highbin)) + "]",
+                       rasterized=True)
+            plt.scatter(concatnewlower['x4'], concatnewlower['y4'], marker = '*', s=250, edgecolors='none', color='indigo', label = str(len(concatnewlower)) + ' / ' + str(finalcountlower) + " Lower Bin [LF - " + str(abs(lowbin)) + "]", rasterized=True)
+            plt.scatter(brightestpointcol, brightestpointmag, marker = '^', s=500, edgecolors='none', color='black', zorder = 3, rasterized=True)
+            plt.scatter(faintestpointcol, faintestpointmag, marker = '^', s=500, edgecolors='none', color='black', zorder = 3, rasterized=True)
+            plt.scatter(centerpointcol, centerpointmag, marker = '^', s=500, edgecolors='none', color='black', zorder = 3, rasterized=True)
 
 
             if wantabund:
-                plt.plot((a_et1['F' + f1 + 'W'] - a_et1['F' + f2 + 'W']), (a_et1['F' + f1 + 'W']), marker = markersize_set, markersize=0.1, linestyle='-', markeredgecolor='none', lw = 5, color=colorsheabund[0], label = 'ET of .' + (key3_st) + ' \(M_\odot\)')
-                plt.plot((a_et2['F' + f1 + 'W'] - a_et2['F' + f2 + 'W']), (a_et2['F' + f1 + 'W']), marker = markersize_set, markersize=0.1, linestyle='-', markeredgecolor='none', lw = 5, color=colorsheabund[1], label = 'ET of .' + (key4_st) + ' \(M_\odot\)')
+                plt.plot((a_et1['F' + f1 + 'W'] - a_et1['F' + f2 + 'W']), (a_et1['F' + f1 + 'W']), marker = markersize_set, markersize=0.1, linestyle='-', markeredgecolor='none', lw = 5, color=colorsheabund[0], label = 'ET of .' + (key3_st) + ' \(M_\odot\)', rasterized=True)
+                plt.plot((a_et2['F' + f1 + 'W'] - a_et2['F' + f2 + 'W']), (a_et2['F' + f1 + 'W']), marker = markersize_set, markersize=0.1, linestyle='-', markeredgecolor='none', lw = 5, color=colorsheabund[1], label = 'ET of .' + (key4_st) + ' \(M_\odot\)', rasterized=True)
                 # z = 2
 
                 # Crossing Times MSTO
@@ -407,7 +411,7 @@ def initialize(df1,
                     # print(str(l) + ": Crossing time of upper bin: " + str(highbin))
                     # print(str(l) + ": Crossing time of lower bin: " + str(lowbin))
                     
-                    plt.scatter(brightestpointcol, brightestpointmag, marker = '^', s=500, edgecolors='none', color=colorsheabund[l], zorder = 3, rasterized=True)
+                    plt.scatter(brightestpointcol, brightestpointmag, marker = '^', s=500, edgecolors='none', color=colorsheabund[l], zorder = 3, rasterized=True, )
                     plt.scatter(faintestpointcol, faintestpointmag, marker = '^', s=500, edgecolors='none', color=colorsheabund[l], zorder = 3, rasterized=True)
                     plt.scatter(centerpointcol, centerpointmag, marker = '^', s=500, edgecolors='none', color=colorsheabund[l], zorder = 3, rasterized=True)
 
@@ -425,7 +429,7 @@ def initialize(df1,
 
         if wantabund:
 
-            plt.figure(figsize=(15, 15), dpi=100) 
+            plt.figure(figsize=(15, 15)) 
             # plt.subplots_adjust(wspace = 0.20)
 
             min_mag -= 0.05
@@ -466,9 +470,9 @@ def initialize(df1,
                     MSCT_a2 = MSCT_a
                 print(str(l) + " - Total CT for this: " + str(MSCT_a))
 
-                plt.scatter(brightestpointcol, brightestpointmag, marker = '^', s=500, edgecolors='none', color=colorsheabund[l], zorder = 3)
-                plt.scatter(faintestpointcol, faintestpointmag, marker = '^', s=500, edgecolors='none', color=colorsheabund[l], zorder = 3)
-                plt.scatter(centerpointcol, centerpointmag, marker = '^', s=500, edgecolors='none', color=colorsheabund[l], zorder = 3)
+                plt.scatter(brightestpointcol, brightestpointmag, marker = '^', s=500, edgecolors='none', color=colorsheabund[l], zorder = 3, rasterized=True)
+                plt.scatter(faintestpointcol, faintestpointmag, marker = '^', s=500, edgecolors='none', color=colorsheabund[l], zorder = 3, rasterized=True)
+                plt.scatter(centerpointcol, centerpointmag, marker = '^', s=500, edgecolors='none', color=colorsheabund[l], zorder = 3, rasterized=True)
 
                 # print(l)
                 
@@ -484,7 +488,7 @@ def initialize(df1,
 
         plt.tight_layout()
         if save:
-            plt.savefig(f'{save_plots_path}{clustername}_MSTOHeAbund_DeltaM{deltaalpha}.pdf')
+            plt.savefig(f'{save_plots_path}{clustername}_MSTOHeAbund_DeltaM{deltaalpha}.pdf', dpi=100)
         plt.show()
         
         if wantcsv:
